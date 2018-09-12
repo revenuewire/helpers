@@ -42,6 +42,9 @@ class Queue
      */
     public static function fetchItemFromQueue($numberOfItems = 10)
     {
+        if (self::$sqsClient === null) {
+            return null;
+        }
         $result = self::$sqsClient->receiveMessage([
             "QueueUrl" => self::$queueUrl,
             "MaxNumberOfMessages" => $numberOfItems,
@@ -59,6 +62,10 @@ class Queue
      */
     public static function placeItemIntoQueue($subject, $message, $delaySeconds = 0)
     {
+        if (self::$sqsClient === null) {
+            return null;
+        }
+
         return self::$sqsClient->sendMessage([
             'DelaySeconds' => $delaySeconds,
             "QueueUrl" => self::$queueUrl,
@@ -76,6 +83,10 @@ class Queue
      */
     public static function deleteBatchMessages($processedItem)
     {
+        if (self::$sqsClient === null) {
+            return null;
+        }
+
         self::$sqsClient->deleteMessageBatch([
             "QueueUrl" => self::$queueUrl,
             'Entries' => $processedItem
