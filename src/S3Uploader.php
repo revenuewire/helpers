@@ -1,5 +1,5 @@
 <?php
-namespace RW\Payments\Helpers;
+namespace RW\Helpers;
 use Aws\S3\S3Client;
 
 class S3Uploader
