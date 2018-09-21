@@ -44,6 +44,10 @@ class Event
      */
     public static function push($subject, $payload)
     {
+        if (self::$snsClient === null) {
+            return;
+        }
+
         self::$snsClient->publish([
             "Subject" => $subject,
             "TopicArn" => self::$topic,

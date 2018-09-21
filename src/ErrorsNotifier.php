@@ -41,6 +41,10 @@ class ErrorsNotifier
      */
     public static function notify($exception, $subject = null, $topic = null, $env = null)
     {
+        if (self::$snsClient === null) {
+            return;
+        }
+
         if ((empty($subject) && empty(self::$subject))
                 || (empty($topic) && empty(self::$topic))){
             return;

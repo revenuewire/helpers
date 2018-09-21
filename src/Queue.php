@@ -80,6 +80,7 @@ class Queue
      * Delete batch messages
      *
      * @param array $processedItem
+     * @return null
      */
     public static function deleteBatchMessages($processedItem)
     {
