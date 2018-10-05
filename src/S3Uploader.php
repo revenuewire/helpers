@@ -9,7 +9,10 @@ class S3Uploader
     public static $bucket;
 
     /**
+     * init
+     *
      * @param $region
+     * @param $bucket
      */
     public static function init($region, $bucket)
     {
@@ -28,33 +31,75 @@ class S3Uploader
      * @return array
      * @throws \Exception
      */
-    public static function uploadByFile($id, $file)
+    public static function uploadByFile($id, $file, $bucket = null)
     {
+        if ($bucket === null) {
+            $bucket = self::$bucket;
+        }
+
         $key = $id . "/" . basename($file);
         if (!file_exists($file)) {
             throw new \Exception("No such file");
         }
-        if (file_put_contents("s3://" . self::$bucket . "/" . $key, file_get_contents($file))) {
-            return [ "bucket" => self::$bucket, "key" => $key ];
+        if (file_put_contents("s3://" . $bucket . "/" . $key, file_get_contents($file))) {
+            return [ "bucket" => $bucket, "key" => $key ];
         }
 
         throw new \Exception("Fail to upload the file");
     }
 
     /**
-     * getPresignedURL
+     * uploadByStream
      *
-     * @param string $bucket
-     * @param string $key
-     * @param int $ttl
-     * @return string
+     * @param $key
+     * @param $body
+     * @param null $bucket
+     * @return \Aws\Result|null
      */
-    public static function getPresignedURL($bucket,  $key, $ttl = 5)
+    public static function uploadByStream($key, $body, $bucket = null)
     {
-        $cmd = self::$client->getCommand('GetObject', [
+        if (self::$client === null) {
+            return null;
+        }
+
+        if ($bucket === null) {
+            $bucket = self::$bucket;
+        }
+
+        $requestParam = [
+            'Bucket' => $bucket,
+            'Key'    => $key,
+            'Body' => $body
+        ];
+
+        return self::$client->putObject($requestParam);
+    }
+
+    /**
+     * @param $key
+     * @param null $filename
+     * @param null $bucket
+     * @param int $ttl
+     * @return null|string
+     */
+    public static function getPresignedURL($key, $filename = null, $bucket = null, $ttl = 5)
+    {
+        if (self::$client === null) {
+            return null;
+        }
+
+        if ($bucket === null) {
+            $bucket = self::$bucket;
+        }
+        $requestParam = [
             'Bucket' => $bucket,
             'Key'    => $key
-        ]);
+        ];
+        if ($filename !== null) {
+            $requestParam["ResponseContentDisposition"] = "attachment; filename=$filename";
+        }
+
+        $cmd = self::$client->getCommand('GetObject', $requestParam);
 
         $request =  self::$client->createPresignedRequest($cmd, "+$ttl minutes");
 
