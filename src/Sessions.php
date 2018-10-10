@@ -16,7 +16,7 @@ class Sessions
      * @param $networkRegion
      * @param $table
      */
-    public function init($networkRegion, $table)
+    public static function init($networkRegion, $table)
     {
         $dynamoDb = new DynamoDbClient(array(
             'region' => $networkRegion,
