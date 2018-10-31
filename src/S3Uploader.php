@@ -25,24 +25,33 @@ class S3Uploader
     }
 
     /**
+     * getId
+     * @return string
+     */
+    public static function getId()
+    {
+        return date("Y-m-d") . "-" . IdFactory::generate(12);
+    }
+
+    /**
      * Upload file from system file path
-     * @param string $id
      * @param string $file
      * @return array
      * @throws \Exception
      */
-    public static function uploadByFile($id, $file, $bucket = null)
+    public static function uploadByFile($file)
     {
-        if ($bucket === null) {
-            $bucket = self::$bucket;
+        if (self::$client === null) {
+            return null;
         }
 
+        $id = self::getId();
         $key = $id . "/" . basename($file);
         if (!file_exists($file)) {
             throw new \Exception("No such file");
         }
-        if (file_put_contents("s3://" . $bucket . "/" . $key, file_get_contents($file))) {
-            return [ "bucket" => $bucket, "key" => $key ];
+        if (file_put_contents("s3://" . self::$bucket . "/" . $key, file_get_contents($file))) {
+            return [ "bucket" => self::$bucket, "key" => $key ];
         }
 
         throw new \Exception("Fail to upload the file");
@@ -51,48 +60,46 @@ class S3Uploader
     /**
      * uploadByStream
      *
-     * @param $key
+     * @param $name
      * @param $body
-     * @param null $bucket
-     * @return \Aws\Result|null
+     * @return array|null
      */
-    public static function uploadByStream($key, $body, $bucket = null)
+    public static function uploadByStream($name, $body)
     {
         if (self::$client === null) {
             return null;
         }
 
-        if ($bucket === null) {
-            $bucket = self::$bucket;
-        }
+        $id = self::getId();
+        $key = $id . "/" . $name;
 
         $requestParam = [
-            'Bucket' => $bucket,
+            'Bucket' => self::$bucket,
             'Key'    => $key,
             'Body' => $body
         ];
 
-        return self::$client->putObject($requestParam);
+        self::$client->putObject($requestParam);
+
+        return [ "bucket" => self::$bucket, "key" => $key ];
     }
 
     /**
+     * getPresignedURL
+     *
      * @param $key
      * @param null $filename
-     * @param null $bucket
      * @param int $ttl
      * @return null|string
      */
-    public static function getPresignedURL($key, $filename = null, $bucket = null, $ttl = 5)
+    public static function getPresignedURL($key, $filename = null, $ttl = 5)
     {
         if (self::$client === null) {
             return null;
         }
 
-        if ($bucket === null) {
-            $bucket = self::$bucket;
-        }
         $requestParam = [
-            'Bucket' => $bucket,
+            'Bucket' => self::$bucket,
             'Key'    => $key
         ];
         if ($filename !== null) {
