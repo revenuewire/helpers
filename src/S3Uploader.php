@@ -51,7 +51,7 @@ class S3Uploader
             throw new \Exception("No such file");
         }
         if (file_put_contents("s3://" . self::$bucket . "/" . $key, file_get_contents($file))) {
-            return [ "bucket" => self::$bucket, "key" => $key, "name" => basename($file) ];
+            return [ "bucket" => self::$bucket, "key" => $key, "filename" => basename($file) ];
         }
 
         throw new \Exception("Fail to upload the file");
@@ -81,7 +81,7 @@ class S3Uploader
 
         self::$client->putObject($requestParam);
 
-        return [ "bucket" => self::$bucket, "key" => $key , "name" => $name];
+        return [ "bucket" => self::$bucket, "key" => $key , "filename" => $name];
     }
 
     /**
