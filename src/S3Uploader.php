@@ -64,7 +64,7 @@ class S3Uploader
      * @param $body
      * @return array|null
      */
-    public static function uploadByStream($name, $body)
+    public static function uploadByStream($name, $body, $contentType = null)
     {
         if (self::$client === null) {
             return null;
@@ -76,8 +76,11 @@ class S3Uploader
         $requestParam = [
             'Bucket' => self::$bucket,
             'Key'    => $key,
-            'Body' => $body
+            'Body' => $body,
         ];
+        if ($contentType) {
+            $requestParam['ContentType'] = $contentType;
+        }
 
         self::$client->putObject($requestParam);
 
