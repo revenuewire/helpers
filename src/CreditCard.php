@@ -62,4 +62,67 @@ class CreditCard
 
         return $firstSix . str_repeat("*", strlen($cardNumber) - 10) . $lastFour;
     }
+
+    /**
+     * @param string $pan
+     * @return mixed
+     */
+    public static function getCardBrand(string $pan)
+    {
+        //maximum length is not fixed now, there are growing number of CCs has more numbers in length, limiting can give false negatives atm
+
+        //these regexps accept not whole cc numbers too
+        //visa
+        $visa_regex = "/^4[0-9]{0,}$/";
+
+        // MasterCard
+        $mastercard_regex = "/^(5[1-5]|222[1-9]|22[3-9]|2[3-6]|27[01]|2720)[0-9]{0,}$/";
+        $maestro_regex = "/^(5[06789]|6)[0-9]{0,}$/";
+
+        // American Express
+        $amex_regex = "/^3[47][0-9]{0,}$/";
+
+        // Diners Club
+        $diners_regex = "/^3(?:0[0-59]{1}|[689])[0-9]{0,}$/";
+
+        //Discover
+        $discover_regex = "/^(6011|65|64[4-9]|62212[6-9]|6221[3-9]|622[2-8]|6229[01]|62292[0-5])[0-9]{0,}$/";
+
+        //JCB
+        $jcb_regex = "/^(?:2131|1800|35)[0-9]{0,}$/";
+
+        //ordering matter in detection, otherwise can give false results in rare cases
+        if (preg_match($jcb_regex, $pan)) {
+            return "JCB";
+        }
+
+        if (preg_match($amex_regex, $pan)) {
+            return "AMEX";
+        }
+
+        if (preg_match($diners_regex, $pan)) {
+            return "DINERSCLUB";
+        }
+
+        if (preg_match($visa_regex, $pan)) {
+            return "VISA";
+        }
+
+        if (preg_match($mastercard_regex, $pan)) {
+            return "MASTERCARD";
+        }
+
+        if (preg_match($discover_regex, $pan)) {
+            return "DISCOVER";
+        }
+
+        if (preg_match($maestro_regex, $pan)) {
+            if ($pan[0] == '5') {//started 5 must be mastercard
+                return "MASTERCARD";
+            }
+            return "MAESTRO"; //maestro is all 60-69 which is not something else, thats why this condition in the end
+        }
+
+        return "UNKNOWN"; //unknown for this system
+    }
 }
