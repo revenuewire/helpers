@@ -69,6 +69,9 @@ class CreditCard
      */
     public static function getCardBrand(string $pan)
     {
+        //in case the pan is already masked. strip the masked part and everything after.
+        $pan = substr($pan, 0, stripos($pan, "*"));
+
         //maximum length is not fixed now, there are growing number of CCs has more numbers in length, limiting can give false negatives atm
 
         //these regexps accept not whole cc numbers too
