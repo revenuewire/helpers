@@ -88,6 +88,24 @@ class S3Uploader
     }
 
     /**
+     * delete
+     *
+     * @param string $key
+     * @return \Aws\Result|null
+     */
+    public static function delete(string $key)
+    {
+        if (self::$client === null) {
+            return null;
+        }
+
+        return self::$client->deleteObject([
+            "Bucket" => self::$bucket,
+            "Key" => $key
+        ]);
+    }
+
+    /**
      * getPresignedURL
      *
      * @param $key
