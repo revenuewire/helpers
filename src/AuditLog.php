@@ -20,7 +20,7 @@ class AuditLog
     /** @var $sqsClient SqsClient */
     public static $sqsClient;
     public static $queueUrl;
-    public static $namespace;
+    public static $service;
 
     /**
      * Init
@@ -29,14 +29,14 @@ class AuditLog
      * @param $queueUrl
      * @param $namespace
      */
-    public static function init(string $region, string $queueUrl, string $namespace)
+    public static function init(string $region, string $queueUrl, string $service)
     {
         self::$sqsClient = new SqsClient([
             "region" => $region,
             "version" => "2012-11-05",
         ]);
         self::$queueUrl = $queueUrl;
-        self::$namespace = $namespace;
+        self::$service = $service;
     }
 
     /**
@@ -48,14 +48,13 @@ class AuditLog
     public static function addLog(string $reference, string $event, string $user = "", array $context = [])
     {
         $eventItem = [
-            "namespace" => self::$namespace,
             "reference" => $reference,
             "event" => $event,
             "user" => $user,
             "datetime" => date("Y-m-d H:i:s"),
             "context" => $context
         ];
-        self::placeItemIntoQueue(self::$namespace, json_encode($eventItem));
+        self::placeItemIntoQueue(self::$service, json_encode($eventItem));
     }
 
     /**
