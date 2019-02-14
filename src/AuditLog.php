@@ -42,15 +42,17 @@ class AuditLog
     /**
      * @param string $reference
      * @param string $event
+     * @param string $clientId
      * @param string $user
      * @param array $context
      */
-    public static function addLog(string $reference, string $event, string $user = "", array $context = [])
+    public static function addLog(string $reference, string $event, string $clientId, string $user = "", array $context = [])
     {
         $eventItem = [
             "reference" => $reference,
             "event" => $event,
             "user" => $user,
+            "clientId" => $clientId,
             "datetime" => date("Y-m-d H:i:s"),
             "context" => $context
         ];
