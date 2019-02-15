@@ -53,7 +53,7 @@ class AuditLog
             "event" => $event,
             "user" => $user,
             "clientId" => $clientId,
-            "datetime" => date("Y-m-d H:i:s"),
+            "created" => time(),
             "context" => $context
         ];
         self::placeItemIntoQueue(self::$service, json_encode($eventItem));
