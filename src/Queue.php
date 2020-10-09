@@ -106,6 +106,7 @@ class Queue
         }
 
         self::$sqsClient->changeMessageVisibility([
+            "QueueUrl" => self::$queueUrl,
             'ReceiptHandle' => $message['ReceiptHandle'],
             'VisibilityTimeout' => $visibilityTimeout
         ]);
