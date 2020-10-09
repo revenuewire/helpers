@@ -93,4 +93,20 @@ class Queue
             'Entries' => $processedItem
         ]);
     }
+
+    /**
+     * @param $message
+     * @param $visibilityTimeout
+     * @return null
+     */
+    public static function changeMessageVisibility($message, $visibilityTimeout)
+    {
+        if (self::$sqsClient === null) {
+            return null;
+        }
+
+        self::$sqsClient->changeMessageVisibility([
+            'ReceiptHandle' => $message['ReceiptHandle'],
+            'VisibilityTimeout' => $visibilityTimeout
+        ]);
 }
