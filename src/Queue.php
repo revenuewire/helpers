@@ -110,4 +110,5 @@ class Queue
             'ReceiptHandle' => $message['ReceiptHandle'],
             'VisibilityTimeout' => $visibilityTimeout
         ]);
+    }
 }
